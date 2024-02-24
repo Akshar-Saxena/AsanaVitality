@@ -59,8 +59,9 @@ router.post("/login", async function (req, res) {
     // }
     if (Object.entries(response).length > 1) {
         res.cookie("access_token", response.accessToken, {
+            expires: new Date(Date.now() + 86400000),
             httpOnly: true,
-            // secure: true,
+            secure: true,
         }).json({ message: "Login Successful" });
     } else {
         res.status(400).json(response);
