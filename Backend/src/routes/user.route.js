@@ -78,7 +78,10 @@ router.get("/info", authMiddleware, function (req, res) {
 });
 
 router.get("/logout", authMiddleware, async function (req, res) {
-    res.clearCookie("access_token");
+    res.clearCookie("access_token", {
+        sameSite: "None",
+        secure: true, // Ensure secure transmission over HTTPS
+    });
     res.json({
         message: "Logout",
     });
