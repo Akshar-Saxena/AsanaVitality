@@ -1,0 +1,124 @@
+{
+    "angles": [
+        {
+            "name": "dandayamana dhanurasana",
+            "start_time": 5,
+            "right_hand": 180,
+            "left_hand": 180,
+            "right_upper": 170,
+            "left_upper": 190,
+            "right_leg": 170,
+            "left_leg": 80,
+            "right_lower": 160,
+            "left_lower": 100
+        },
+        {
+            "name": "utthita parsvakonasana",
+            "start_time": 9,
+            "right_hand": 180,
+            "left_hand": "null",
+            "right_upper": 180,
+            "left_upper": "null",
+            "right_leg": 180,
+            "left_leg": 100,
+            "right_lower": "null",
+            "left_lower": "null"
+        },
+        {
+            "name": "alanasana",
+            "start_time": 11,
+            "right_hand": 180,
+            "left_hand": 180,
+            "right_upper": 180,
+            "left_upper": 180,
+            "right_leg": 60,
+            "left_leg": 170,
+            "right_lower": "null",
+            "left_lower": "null"
+        },
+        {
+            "name": "padahastasana",
+            "start_time": 16,
+            "right_hand": 180,
+            "left_hand": 180,
+            "right_upper": "null",
+            "left_upper": "null",
+            "right_leg": 180,
+            "left_leg": 180,
+            "right_lower": "null",
+            "left_lower": "null"
+        },
+        {
+            "name": "natarajasana",
+            "start_time": 18,
+            "right_hand": 180,
+            "left_hand": 180,
+            "right_upper": "null",
+            "left_upper": "null",
+            "right_leg": 180,
+            "left_leg": 90,
+            "right_lower": "null",
+            "left_lower": "null"
+        },
+        {
+            "name": "viparita virabhadrasana",
+            "start_time": 22,
+            "right_hand": 160,
+            "left_hand": 170,
+            "right_upper": "null",
+            "left_upper": "null ",
+            "right_leg": 90,
+            "left_leg": 180,
+            "right_lower": "null",
+            "left_lower": "null"
+        },
+        {
+            "name": "virabhadrasana 2",
+            "start_time": 25,
+            "right_hand": 180,
+            "left_hand": 180,
+            "right_upper": 180,
+            "left_upper": 180,
+            "right_leg": 180,
+            "left_leg": 90,
+            "right_lower": "null ",
+            "left_lower": "null"
+        },
+        {
+            "name": "virabhadrasana 3",
+            "start_time": 28,
+            "right_hand": 180,
+            "left_hand": 180,
+            "right_upper": "null",
+            "left_upper": "null",
+            "right_leg": 180,
+            "left_leg": 180,
+            "right_lower": "null",
+            "left_lower": "null"
+        },
+        {
+            "name": "eka pada utkatasana",
+            "start_time": 34,
+            "right_hand": 80,
+            "left_hand": 80,
+            "right_upper": "null",
+            "left_upper": "null",
+            "right_leg": 60,
+            "left_leg": 180,
+            "right_lower": "null",
+            "left_lower": "null"
+        },
+        {
+            "name": "ardha chandrasana ",
+            "start_time": 36,
+            "right_hand": 180,
+            "left_hand": 180,
+            "right_upper": 180,
+            "left_upper": 180,
+            "right_leg": 180,
+            "left_leg": 180,
+            "right_lower": 90,
+            "left_lower": 180
+        }
+    ]
+}

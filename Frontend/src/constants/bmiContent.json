@@ -1,0 +1,39 @@
+[
+    {
+        "name": "Underweight",
+        "bmi_lower": 0,
+        "bmi_upper": 18.5,
+        "description": "Individuals with a BMI below 18.5 are considered underweight. They may have insufficient body fat or muscle mass, which can indicate malnutrition or certain health conditions. They might experience fatigue, weakened immune function, and nutritional deficiencies."
+    },
+    {
+        "name": "Normal weight",
+        "bmi_lower": 18.5,
+        "bmi_upper": 24.9,
+        "description": "Individuals with a BMI in this range are considered to have a healthy weight. They typically have a balanced ratio of body fat to muscle mass, which is associated with lower risk of chronic diseases. Maintaining a normal weight can contribute to overall well-being and reduce the risk of various health issues."
+    },
+    {
+        "name": "Overweight",
+        "bmi_lower": 25,
+        "bmi_upper": 29.9,
+        "description": "Individuals with a BMI in this range are considered overweight. They may have excess body fat, which can increase the risk of developing conditions such as heart disease, type 2 diabetes, and hypertension. Weight loss through diet and exercise is often recommended to improve health outcomes."
+    },
+    {
+        "name": "Obese (Class I)",
+        "bmi_lower": 30,
+        "bmi_upper": 34.9,
+        "description": "Individuals with a BMI in this range are classified as obese (Class I). They have a significant excess of body fat, which poses a higher risk of serious health problems, including cardiovascular disease, stroke, and certain cancers. Lifestyle changes, including dietary modifications and increased physical activity, are typically recommended to manage weight and improve health."
+    },
+    {
+        "name": "Obese (Class II)",
+        "bmi_lower": 35,
+        "bmi_upper": 39.9,
+        "description": "Individuals with a BMI in this range are classified as obese (Class II). They have a higher level of obesity, increasing the risk of developing severe health complications, such as sleep apnea, osteoarthritis, and metabolic syndrome. Medical intervention, including supervised weight loss programs and possibly surgery, may be necessary for significant weight reduction and improved health outcomes."
+    },
+    {
+        "name": "Obese (Class III)",
+        "bmi_range": "40 or greater",
+        "bmi_lower": 40,
+        "bmi_upper": 1000,
+        "description": "Individuals with a BMI of 40 or greater are classified as obese (Class III), commonly referred to as morbid obesity. This level of obesity is associated with a substantially increased risk of life-threatening conditions, including heart disease, stroke, and certain cancers. Medical intervention, such as bariatric surgery, may be considered for weight management in severe cases, along with comprehensive lifestyle changes and ongoing medical monitoring."
+    }
+]
