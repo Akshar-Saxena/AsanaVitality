@@ -32,7 +32,7 @@ router.post("/signup", async function (req, res) {
     try {
         if (response.accessToken) {
             res.cookie("access_token", response.accessToken, {
-                sameSite: "strict",
+                sameSite: "none",
                 expires: new Date(Date.now() + 86400000),
                 httpOnly: true,
                 secure: true,
@@ -61,7 +61,7 @@ router.post("/login", async function (req, res) {
     // }
     if (Object.entries(response).length > 1) {
         res.cookie("access_token", response.accessToken, {
-            sameSite: "strict",
+            sameSite: "none",
             expires: new Date(Date.now() + 86400000),
             httpOnly: true,
             secure: true,
