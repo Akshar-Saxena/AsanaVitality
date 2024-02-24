@@ -42,6 +42,7 @@ export default function Session() {
     const [lu, setLu] = useState(0);
     const [rlw, setRlw] = useState(0);
     const [llw, setLlw] = useState(0);
+    const [flag, setFlag] = useState(false);
     time.setSeconds(time.getSeconds() + 600);
 
     let count = 0;
@@ -262,47 +263,72 @@ export default function Session() {
     };
 
     return (
-        <div className="w-full mt-10">
-            <div className="w-[95%] flex justify-evenly items-center m-auto">
-                <Webcam
-                    ref={videoRef}
-                    videoConstraints={{
-                        width: 640,
-                        height: 480,
-                        facingMode: "user",
-                    }}
-                    style={{
-                        transform: "scaleX(-1)",
-                        border: "2px solid #BD7A71",
-                        borderRadius: "10px",
-                        boxShadow: "0px 10px 10px gray",
-                    }}
-                    audio={false}
-                />
+        <div>
+            {!flag ? (
+                <div className="w-[300px] flex flex-col justify-center p-6 px-10 rounded-md shadow-sm shadow-gray-400 m-auto mt-[50vh] -translate-y-1/2 bg-gray-100">
+                    <ul className="list-disc">
+                        <li className="mb-4 text-justify">
+                            Ensure the background is clear. Wear clothing that
+                            contrasts with the background.
+                        </li>
+                        <li className="mb-4 text-justify">
+                            Strong network connection
+                        </li>
+                        <li className="mb-4 text-justify">
+                            The entire body should be visible on the webcam.
+                        </li>
+                    </ul>
+                    <button
+                        className="bg-green-600 mt-10 text-white py-2 px-7 rounded-md"
+                        onClick={() => setFlag(true)}
+                    >
+                        I Agree
+                    </button>
+                </div>
+            ) : (
+                <div className="w-full mt-10">
+                    <div className="w-[95%] flex justify-evenly items-center m-auto">
+                        <Webcam
+                            ref={videoRef}
+                            videoConstraints={{
+                                width: 640,
+                                height: 480,
+                                facingMode: "user",
+                            }}
+                            style={{
+                                transform: "scaleX(-1)",
+                                border: "2px solid #BD7A71",
+                                borderRadius: "10px",
+                                boxShadow: "0px 10px 10px gray",
+                            }}
+                            audio={false}
+                        />
 
-                <div className="w-[40%]">
-                    <VideoPlayer />
-                    <h1>Next: Asana</h1>
-                    <MyTimer expiryTimestamp={time} />
+                        <div className="w-[40%]">
+                            <VideoPlayer />
+                            <h1>Next: Asana</h1>
+                            <MyTimer expiryTimestamp={time} />
 
-                    {/* <h1>
+                            {/* <h1>
                         Time:{" "}
                         {`${min.toString().padStart(2, "0")}:${sec
                             .toString()
                             .padStart(2, "0")}`}
                     </h1> */}
+                        </div>
+                    </div>
+                    <div className="w-full flex flex-col justify-center items-center py-16 font-semibold">
+                        <h1>Right hand angle: {rh}</h1>
+                        <h1>Left hand angle: {lh}</h1>
+                        <h1>Right leg angle: {rl}</h1>
+                        <h1>Left leg angle: {ll}</h1>
+                        <h1>Right Upper angle: {ru}</h1>
+                        <h1>Left Upper angle: {lu}</h1>
+                        <h1>Right Lower angle: {rlw}</h1>
+                        <h1>Left Lower angle: {llw}</h1>
+                    </div>
                 </div>
-            </div>
-            <div className="w-full flex flex-col justify-center items-center py-16 font-semibold">
-                <h1>Right hand angle: {rh}</h1>
-                <h1>Left hand angle: {lh}</h1>
-                <h1>Right leg angle: {rl}</h1>
-                <h1>Left leg angle: {ll}</h1>
-                <h1>Right Upper angle: {ru}</h1>
-                <h1>Left Upper angle: {lu}</h1>
-                <h1>Right Lower angle: {rlw}</h1>
-                <h1>Left Lower angle: {llw}</h1>
-            </div>
+            )}
         </div>
     );
 }
