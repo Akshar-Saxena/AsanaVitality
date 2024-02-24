@@ -47,20 +47,23 @@ router.post("/signup", async function (req, res) {
 router.post("/login", async function (req, res) {
     const data = req.body;
     const response = await login(data);
-    try {
-        if (response.accessToken) {
-            res.cookie("access_token", response.accessToken, {
-                httpOnly: true,
-                secure: true,
-            });
-        }
-    } catch (error) {
-        null;
-    }
+    // try {
+    //     if (response.accessToken) {
+    //         res.cookie("access_token", response.accessToken, {
+    //             httpOnly: true,
+    //             secure: true,
+    //         });
+    //     }
+    // } catch (error) {
+    //     null;
+    // }
     if (Object.entries(response).length > 1) {
-        res.json({ message: "Login Successful" });
+        res.cookie("access_token", response.accessToken, {
+            httpOnly: true,
+            secure: true,
+        }).json({ message: "Login Successful" });
     } else {
-        res.json(response);
+        res.status(400).json(response);
     }
 });
 
