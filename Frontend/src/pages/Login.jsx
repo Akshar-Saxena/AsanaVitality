@@ -28,19 +28,10 @@ export default function Login() {
                 withCredentials: true,
             })
             .then((res) => {
-                if (
-                    res.data.message.includes("User") ||
-                    res.data.message.includes("Invalid")
-                ) {
-                    setLoading(false);
-                    toast.error(res.data.message);
-                } else {
-                    setLoading(false);
-                    toast.success(res.data.message);
-                    // window.location.href = "/";
-                }
+                window.location.href = "/";
             })
             .catch((err) => {
+                toast.error(err.response.data.message);
                 console.log(err);
                 setLoading(false);
             });
