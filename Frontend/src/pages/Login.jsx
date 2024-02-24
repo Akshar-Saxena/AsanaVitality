@@ -16,6 +16,10 @@ export default function Login() {
         },
     });
 
+    window.onkeydown = (e) => {
+        if (e.key == "Enter") validation();
+    };
+
     const [userDetails, setUserDetails] = useState({
         email: "",
         password: "",

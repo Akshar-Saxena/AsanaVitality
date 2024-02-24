@@ -17,6 +17,10 @@ export default function Welcome() {
         age: 0,
     });
 
+    window.onkeydown = (e) => {
+        if (e.key == "Enter") validation();
+    };
+
     const theme = createTheme({
         palette: {
             primary: {

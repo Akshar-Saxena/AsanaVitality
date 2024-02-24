@@ -12,6 +12,16 @@ export default function Signup() {
     const navigate = useNavigate();
     const [stateOtp, stateSetOtp] = useState(-2328243434);
 
+    window.onkeydown = (e) => {
+        if (e.key == "Enter") {
+            if (otp) {
+                SignUpHandler();
+            } else {
+                validation();
+            }
+        }
+    };
+
     const theme = createTheme({
         palette: {
             primary: {
