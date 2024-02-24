@@ -109,7 +109,7 @@ router.post("/profile", profileMiddleware, async function (req, res) {
                 userModel
                     .findOneAndUpdate(
                         { email: user[0].email },
-                        { profile: res._id },
+                        { profile: response1._id },
                         { new: true }
                     )
                     .then((response2) => {
