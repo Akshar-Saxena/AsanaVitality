@@ -56,10 +56,7 @@ export default function Session() {
     };
 
     useEffect(() => {
-        return () => {
-            runPosenet();
-            clearInterval();
-        };
+        runPosenet();
     }, []); // Run only once on component mount
 
     function find_angle(p0, p1, c) {
