@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import * as posenet from "@tensorflow-models/posenet";
 import { drawKeypoints, drawSkeleton } from "../constants/utilities";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import VideoPlayer from "../components/VideoPlayer";
 import { useTimer } from "react-timer-hook";
 import yogaLandmarks from "../constants/yogaLandmarks.json";
@@ -33,6 +33,7 @@ function MyTimer({ expiryTimestamp }) {
 export default function Session() {
     const { id } = useParams();
     const videoRef = useRef(null);
+    const navigate = useNavigate();
     const time = new Date();
     const [rh, setRh] = useState(0);
     const [lh, setLh] = useState(0);
@@ -55,6 +56,32 @@ export default function Session() {
             detect(net);
         }, 1000);
     };
+
+    useEffect(() => {
+        function handleReload(event) {
+            event.preventDefault();
+            window.removeEventListener("beforeunload", handleReload, {
+                capture: true,
+            });
+            return (event.returnValue = "");
+        }
+        window.history.pushState({}, null, null);
+
+        window.addEventListener("beforeunload", handleReload, {
+            capture: true,
+        });
+
+        window.addEventListener("popstate", handleReload, { capture: true });
+
+        return () => {
+            window.removeEventListener("beforeunload", handleReload, {
+                capture: true,
+            });
+            window.removeEventListener("popstate", handleReload, {
+                capture: true,
+            });
+        };
+    });
 
     useEffect(() => {
         runPosenet();
@@ -308,6 +335,12 @@ export default function Session() {
                             <VideoPlayer />
                             <h1>Next: Asana</h1>
                             <MyTimer expiryTimestamp={time} />
+                            <button
+                                className="bg-red-600 mt-10 text-white py-2 px-7 rounded-md"
+                                onClick={() => navigate("/")}
+                            >
+                                End Session
+                            </button>
 
                             {/* <h1>
                         Time:{" "}
