@@ -11,70 +11,65 @@ import axios from "axios";
 
 let yogaMeans = [];
 const allYogaScores = [];
+let sec, min;
 
-function MyTimer({ expiryTimestamp }) {
-    const [loading, setLoading] = useState(false);
-    const {
-        totalSeconds,
-        seconds,
-        minutes,
-        hours,
-        days,
-        isRunning,
-        start,
-        pause,
-        resume,
-        restart,
-    } = useTimer({
-        expiryTimestamp,
-        onExpire: () => {
-            setLoading(true);
-            const calories =
-                3 * 56 * ((60 - seconds + (4 - minutes) * 60) / 3600);
-            let s = 0;
-            for (let i = 0; i < allYogaScores.length; i++) {
-                s += allYogaScores[i];
-            }
-            const records = {
-                score: s,
-                best_yoga:
-                    yogaLandmarks.angles[
-                        allYogaScores.indexOf(Math.max(...allYogaScores))
-                    ].name,
-                worst_yoga:
-                    yogaLandmarks.angles[
-                        allYogaScores.indexOf(Math.min(...allYogaScores))
-                    ].name,
-                calories_burned: calories.toFixed(2),
-            };
+function endSession(minutes, seconds) {
+    const calories = 3 * 56 * ((60 - seconds + (4 - minutes) * 60) / 3600);
+    let s = 0;
+    for (let i = 0; i < allYogaScores.length; i++) {
+        s += allYogaScores[i];
+    }
+    const records = {
+        score: s,
+        best_yoga:
+            yogaLandmarks.angles[
+                allYogaScores.indexOf(Math.max(...allYogaScores))
+            ].name,
+        worst_yoga:
+            yogaLandmarks.angles[
+                allYogaScores.indexOf(Math.min(...allYogaScores))
+            ].name,
+        calories_burned: calories.toFixed(2),
+    };
+    axios
+        .post(
+            import.meta.env.VITE_BACKEND_API + "/api/records/editRecords",
+            { record: records },
+            { withCredentials: true }
+        )
+        .then((res) => {
             axios
-                .post(
-                    import.meta.env.VITE_BACKEND_API +
-                        "/api/records/editRecords",
-                    { record: records },
+                .get(
+                    "/api/session/deleleSession",
+                    { sessionId: id },
                     { withCredentials: true }
                 )
                 .then((res) => {
-                    setLoading(false);
                     window.location.href = "/profile";
                 })
                 .catch((err) => {
-                    console.log(err);
+                    null;
                 });
-        },
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+}
+
+function MyTimer({ expiryTimestamp }) {
+    let { seconds, minutes } = useTimer({
+        expiryTimestamp,
+        onExpire: () => endSession(minutes, seconds),
     });
 
+    sec = seconds;
+    min = minutes;
+
     return (
-        <>
-            {loading ? (
-                <Loader />
-            ) : (
-                <h1 className="text-2xl font-bold">
-                    Time Left: {minutes.toString().padStart(2, 0)}:
-                    {seconds.toString().padStart(2, 0)}
-                </h1>
-            )}
-        </>
+        <h1 className="text-2xl font-bold">
+            Time Left: {minutes.toString().padStart(2, 0)}:
+            {seconds.toString().padStart(2, 0)}
+        </h1>
     );
 }
 
@@ -83,6 +78,22 @@ export default function Session() {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const navigate = useNavigate();
+    useEffect(() => {
+        axios
+            .post(
+                import.meta.env.VITE_BACKEND_API + "/api/session/verifySession",
+                {
+                    sessionId: id,
+                },
+                { withCredentials: true }
+            )
+            .then(() => {
+                null;
+            })
+            .catch((err) => {
+                navigate("/");
+            });
+    }, []);
 
     const time = new Date();
     let index = 0;
@@ -196,22 +207,6 @@ export default function Session() {
         return Math.atan(tanthetha);
     }
 
-    function drawPose(pose) {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d");
-
-        // Clear the canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Draw keypoints
-        pose.keypoints.forEach(({ position }) => {
-            ctx.beginPath();
-            ctx.arc(position.x, position.y, 5, 0, 2 * Math.PI);
-            ctx.fillStyle = "red";
-            ctx.fill();
-        });
-    }
-
     const angleCorrector = (angle) => {
         if (angle < 0) {
             return Math.round(180 + angle * 57.2958);
@@ -237,7 +232,6 @@ export default function Session() {
             videoRef.current.video.height = videoHeight;
 
             const pose = await net.estimateSinglePose(video);
-            drawPose(pose);
             const landmarks = [];
             const fullLandmarks = [];
             let temp = [];
@@ -491,32 +485,21 @@ export default function Session() {
             ) : (
                 <div className="w-full mt-10">
                     <div className="w-[95%] flex justify-evenly items-center m-auto">
-                        <div className="relative">
-                            <Webcam
-                                ref={videoRef}
-                                videoConstraints={{
-                                    width: 640,
-                                    height: 480,
-                                    facingMode: "user",
-                                }}
-                                style={{
-                                    transform: "scaleX(-1)",
-                                    border: "2px solid #BD7A71",
-                                    borderRadius: "10px",
-                                    boxShadow: "0px 10px 10px gray",
-                                }}
-                                audio={false}
-                            />
-                            <canvas
-                                ref={canvasRef}
-                                style={{
-                                    transform: "scaleX(-1)",
-                                }}
-                                className="absolute top-0 left-0"
-                                width={640}
-                                height={480}
-                            ></canvas>
-                        </div>
+                        <Webcam
+                            ref={videoRef}
+                            videoConstraints={{
+                                width: 640,
+                                height: 480,
+                                facingMode: "user",
+                            }}
+                            style={{
+                                transform: "scaleX(-1)",
+                                border: "2px solid #BD7A71",
+                                borderRadius: "10px",
+                                boxShadow: "0px 10px 10px gray",
+                            }}
+                            audio={false}
+                        />
 
                         <div className="w-[40%]">
                             {/* <VideoPlayer /> */}
@@ -533,7 +516,7 @@ export default function Session() {
                                 onClick={() => {
                                     clearInterval(interval);
                                     setFlag(false);
-                                    navigate("/");
+                                    endSession(min, sec);
                                 }}
                             >
                                 End Session

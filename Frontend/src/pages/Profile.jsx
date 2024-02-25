@@ -4,10 +4,12 @@ import NavBar from "../components/NavBar";
 import { div } from "@tensorflow/tfjs";
 import Loader from "../components/Loader";
 import Footer from "../components/Footer";
+import Record from "../components/Record";
 
 export default function Profile() {
     const [verified, setVerified] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [records, setRecords] = useState([]);
     const [userData, setUserData] = useState({
         email: "",
         username: "",
@@ -48,7 +50,18 @@ export default function Profile() {
                             }
                         )
                         .then((res) => {
-                            console.log(res.data);
+                            axios
+                                .get(
+                                    import.meta.env.VITE_BACKEND_API +
+                                        "/api/records/getRecords",
+                                    { withCredentials: true }
+                                )
+                                .then((res) => {
+                                    setRecords(res.data.records);
+                                })
+                                .catch((err) => {
+                                    null;
+                                });
                             setUserData(res.data);
                             setLoading(false);
                         })
@@ -129,6 +142,9 @@ export default function Profile() {
                                 ns
                             </span>
                         </h1>
+                        {records.map((element) => (
+                            <Record record={element} />
+                        ))}
                     </div>
                     <Footer />
                 </div>
