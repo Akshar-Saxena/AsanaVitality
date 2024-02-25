@@ -49,14 +49,14 @@ router.post("/deleteSession", profileMiddleware, async function (req, res) {
             email: req.body.email,
             sessionId: req.body.sessionId,
         })
-        .then((res) => {
-            if (typeof res == null) {
+        .then((deletedSession) => {
+            if (!deletedSession) {
                 res.status(500).json({ message: "Error deleting session" });
             } else {
                 res.json({ message: "Session deleted" });
             }
         })
-        .catch((e) => {
+        .catch((err) => {
             res.status(500).json({ message: "Session not found" });
         });
 });
