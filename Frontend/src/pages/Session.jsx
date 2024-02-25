@@ -6,8 +6,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import VideoPlayer from "../components/VideoPlayer";
 import { useTimer } from "react-timer-hook";
 import yogaLandmarks from "../constants/yogaLandmarks.json";
+import Loader from "../components/Loader";
+import axios from "axios";
+
+let yogaMeans = [];
+const allYogaScores = [];
 
 function MyTimer({ expiryTimestamp }) {
+    const [loading, setLoading] = useState(false);
     const {
         totalSeconds,
         seconds,
@@ -21,19 +27,63 @@ function MyTimer({ expiryTimestamp }) {
         restart,
     } = useTimer({
         expiryTimestamp,
-        onExpire: () => console.warn("onExpire called"),
+        onExpire: () => {
+            setLoading(true);
+            const calories =
+                3 * 56 * ((60 - seconds + (4 - minutes) * 60) / 3600);
+            let s = 0;
+            for (let i = 0; i < allYogaScores.length; i++) {
+                s += allYogaScores[i];
+            }
+            const records = {
+                score: s,
+                best_yoga:
+                    yogaLandmarks.angles[
+                        allYogaScores.indexOf(Math.max(...allYogaScores))
+                    ].name,
+                worst_yoga:
+                    yogaLandmarks.angles[
+                        allYogaScores.indexOf(Math.min(...allYogaScores))
+                    ].name,
+                calories_burned: calories.toFixed(2),
+            };
+            axios
+                .post(
+                    import.meta.env.VITE_BACKEND_API +
+                        "/api/records/editRecords",
+                    { record: records },
+                    { withCredentials: true }
+                )
+                .then((res) => {
+                    setLoading(false);
+                    window.location.href = "/profile";
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        },
     });
+
     return (
-        <h1 className="text-2xl font-bold">
-            Time Left: {minutes}:{seconds}
-        </h1>
+        <>
+            {loading ? (
+                <Loader />
+            ) : (
+                <h1 className="text-2xl font-bold">
+                    Time Left: {minutes.toString().padStart(2, 0)}:
+                    {seconds.toString().padStart(2, 0)}
+                </h1>
+            )}
+        </>
     );
 }
 
 export default function Session() {
     const { id } = useParams();
     const videoRef = useRef(null);
+    const canvasRef = useRef(null);
     const navigate = useNavigate();
+
     const time = new Date();
     let index = 0;
     const [yogaName, setYogaName] = useState(
@@ -50,17 +100,17 @@ export default function Session() {
     );
     const [yogaImg, setYogaImg] = useState("/yogaImages/yoga-1.png");
     let counter = 0;
-    const [rh, setRh] = useState(0);
-    const [lh, setLh] = useState(0);
-    const [rl, setRl] = useState(0);
-    const [ll, setLl] = useState(0);
-    const [ru, setRu] = useState(0);
-    const [lu, setLu] = useState(0);
-    const [rlw, setRlw] = useState(0);
-    const [llw, setLlw] = useState(0);
+    // const [rh, setRh] = useState(0);
+    // const [lh, setLh] = useState(0);
+    // const [rl, setRl] = useState(0);
+    // const [ll, setLl] = useState(0);
+    // const [ru, setRu] = useState(0);
+    // const [lu, setLu] = useState(0);
+    // const [rlw, setRlw] = useState(0);
+    // const [llw, setLlw] = useState(0);
     const [flag, setFlag] = useState(false);
     let interval;
-    time.setSeconds(time.getSeconds() + 600);
+    time.setSeconds(time.getSeconds() + 150);
 
     let count = 0;
     const runPosenet = async () => {
@@ -69,7 +119,6 @@ export default function Session() {
             scale: 0.8,
         });
         interval = setInterval(() => {
-            detect(net);
             counter = counter + 1;
             if (counter == 15) {
                 counter = 0;
@@ -97,6 +146,7 @@ export default function Session() {
                               .join(" ")
                 );
             }
+            detect(net, counter, index);
         }, 1000);
     };
 
@@ -146,15 +196,32 @@ export default function Session() {
         return Math.atan(tanthetha);
     }
 
+    function drawPose(pose) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw keypoints
+        pose.keypoints.forEach(({ position }) => {
+            ctx.beginPath();
+            ctx.arc(position.x, position.y, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = "red";
+            ctx.fill();
+        });
+    }
+
     const angleCorrector = (angle) => {
         if (angle < 0) {
             return Math.round(180 + angle * 57.2958);
         } else {
             return Math.round(angle * 57.2958);
         }
+        // return angle;
     };
 
-    const detect = async (net) => {
+    const detect = async (net, counter, index) => {
         // Make Detections
         if (
             typeof videoRef.current !== "undefined" &&
@@ -170,21 +237,11 @@ export default function Session() {
             videoRef.current.video.height = videoHeight;
 
             const pose = await net.estimateSinglePose(video);
+            drawPose(pose);
             const landmarks = [];
             const fullLandmarks = [];
             let temp = [];
-            // pose.keypoints.forEach((element) => {
-            //     if (
-            //         element.part == "leftShoulder" ||
-            //         element.part == "leftWrist" ||
-            //         element.part == "leftElbow"
-            //     ) {
-            //         temp.push(element.position);
-            //         fullLandmarks.push(element);
-            //     }
-            // });
-            const { right_hand, left_hand, right_leg, left_leg } =
-                yogaLandmarks.angles[0];
+
             const leftShoulder = pose.keypoints.find(
                 (kp) => kp.part === "leftShoulder"
             );
@@ -278,6 +335,78 @@ export default function Session() {
                 )
             );
 
+            let count = 0;
+            for (let key in yogaLandmarks.angles[index]) {
+                if (yogaLandmarks.angles[index][key] != "null") {
+                    count += 1;
+                }
+            }
+            count = count - 2;
+            // console.log(count);
+
+            yogaMeans.push(
+                Math.round(
+                    (Math.abs(
+                        rightHandAngle -
+                            (yogaLandmarks.angles[index].right_hand == "null"
+                                ? rightHandAngle
+                                : yogaLandmarks.angles[index].right_hand)
+                    ) +
+                        Math.abs(
+                            leftHandAngle -
+                                (yogaLandmarks.angles[index].left_hand == "null"
+                                    ? leftHandAngle
+                                    : yogaLandmarks.angles[index].left_hand)
+                        ) +
+                        Math.abs(
+                            rightUpperAngle -
+                                (yogaLandmarks.angles[index].right_upper ==
+                                "null"
+                                    ? rightUpperAngle
+                                    : yogaLandmarks.angles[index].right_upper)
+                        ) +
+                        Math.abs(
+                            leftUpperAngle -
+                                (yogaLandmarks.angles[index].left_upper ==
+                                "null"
+                                    ? leftUpperAngle
+                                    : yogaLandmarks.angles[index].left_upper)
+                        ) +
+                        Math.abs(
+                            rightLegAngle -
+                                (yogaLandmarks.angles[index].right_leg == "null"
+                                    ? rightLegAngle
+                                    : yogaLandmarks.angles[index].right_leg)
+                        ) +
+                        Math.abs(
+                            leftLegAngle -
+                                (yogaLandmarks.angles[index].left_leg == "null"
+                                    ? leftLegAngle
+                                    : yogaLandmarks.angles[index].left_leg)
+                        ) +
+                        Math.abs(
+                            rightUpperAngle -
+                                (yogaLandmarks.angles[index].right_upper ==
+                                "null"
+                                    ? rightUpperAngle
+                                    : yogaLandmarks.angles[index].right_upper)
+                        ) +
+                        Math.abs(
+                            leftUpperAngle -
+                                (yogaLandmarks.angles[index].left_upper ==
+                                "null"
+                                    ? leftUpperAngle
+                                    : yogaLandmarks.angles[index].left_upper)
+                        )) /
+                        count
+                )
+            );
+
+            if (counter == 14) {
+                allYogaScores.push(Math.max(...yogaMeans));
+                yogaMeans = [];
+            }
+
             // const findScore = (rh0, lh0, rl0, ll0, rh1, lh1, rl1, ll1) => {
             //     let mean =
             //         (Math.abs(rh0 - rh1) +
@@ -308,14 +437,14 @@ export default function Session() {
             // console.log("Right Lower angle: " + rightLowerAngle);
             // console.log("Left Lower angle: " + leftLowerAngle);
             // console.log(".....................................\n");
-            setRh(rightHandAngle);
-            setLh(180 - leftHandAngle);
-            setRl(rightLegAngle);
-            setLl(leftLegAngle);
-            setRu(rightUpperAngle);
-            setLu(leftUpperAngle);
-            setRlw(rightLowerAngle);
-            setLlw(leftLowerAngle);
+            // setRh(rightHandAngle);
+            // setLh(180 - leftHandAngle);
+            // setRl(rightLegAngle);
+            // setLl(180 - leftLegAngle);
+            // setRu(180 - rightUpperAngle);
+            // setLu(leftUpperAngle);
+            // setRlw(rightLowerAngle);
+            // setLlw(leftLowerAngle);
             // console.log("\n...............Original..............");
             // console.log("Right hand angle: " + right_hand);
             // console.log("Left hand angle: " + left_hand);
@@ -362,21 +491,32 @@ export default function Session() {
             ) : (
                 <div className="w-full mt-10">
                     <div className="w-[95%] flex justify-evenly items-center m-auto">
-                        <Webcam
-                            ref={videoRef}
-                            videoConstraints={{
-                                width: 640,
-                                height: 480,
-                                facingMode: "user",
-                            }}
-                            style={{
-                                transform: "scaleX(-1)",
-                                border: "2px solid #BD7A71",
-                                borderRadius: "10px",
-                                boxShadow: "0px 10px 10px gray",
-                            }}
-                            audio={false}
-                        />
+                        <div className="relative">
+                            <Webcam
+                                ref={videoRef}
+                                videoConstraints={{
+                                    width: 640,
+                                    height: 480,
+                                    facingMode: "user",
+                                }}
+                                style={{
+                                    transform: "scaleX(-1)",
+                                    border: "2px solid #BD7A71",
+                                    borderRadius: "10px",
+                                    boxShadow: "0px 10px 10px gray",
+                                }}
+                                audio={false}
+                            />
+                            <canvas
+                                ref={canvasRef}
+                                style={{
+                                    transform: "scaleX(-1)",
+                                }}
+                                className="absolute top-0 left-0"
+                                width={640}
+                                height={480}
+                            ></canvas>
+                        </div>
 
                         <div className="w-[40%]">
                             {/* <VideoPlayer /> */}
@@ -407,15 +547,15 @@ export default function Session() {
                     </h1> */}
                         </div>
                     </div>
-                    <div className="w-full flex flex-col justify-center items-center py-16 font-semibold">
-                        <h1>Right hand angle: {rh}</h1>
+                    <div className="w-full text-4xl flex flex-col justify-center items-center py-16 font-semibold">
+                        {/* <h1>Right hand angle: {rh}</h1>
                         <h1>Left hand angle: {lh}</h1>
                         <h1>Right leg angle: {rl}</h1>
                         <h1>Left leg angle: {ll}</h1>
                         <h1>Right Upper angle: {ru}</h1>
                         <h1>Left Upper angle: {lu}</h1>
                         <h1>Right Lower angle: {rlw}</h1>
-                        <h1>Left Lower angle: {llw}</h1>
+                        <h1>Left Lower angle: {llw}</h1> */}
                     </div>
                 </div>
             )}
