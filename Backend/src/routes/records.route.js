@@ -7,6 +7,17 @@ dotenv.config();
 
 const router = express.Router();
 
+router.get("/getRecords", profileMiddleware, async (req, res) => {
+    const results = await recordModel.find({ email: req.body.email });
+    if (results.length > 0) {
+        res.json({
+            records: results[0].records,
+        });
+    } else {
+        res.status(404).json({ message: "No records found" });
+    }
+});
+
 router.post("/editRecords", profileMiddleware, async (req, res) => {
     const { email, record } = req.body;
     const results = await recordModel.find({ email: email });
