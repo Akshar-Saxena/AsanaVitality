@@ -16,7 +16,7 @@ router.post("/editRecords", profileMiddleware, async (req, res) => {
                 {
                     email: email,
                 },
-                { records: record },
+                { records: [...results[0].records, record] },
                 { new: true }
             )
             .then(() => {
