@@ -35,6 +35,21 @@ export default function Session() {
     const videoRef = useRef(null);
     const navigate = useNavigate();
     const time = new Date();
+    let index = 0;
+    const [yogaName, setYogaName] = useState(
+        yogaLandmarks.angles[index].name
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")
+    );
+    const [nextYogaName, setNextYogaName] = useState(
+        yogaLandmarks.angles[index + 1].name
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ")
+    );
+    const [yogaImg, setYogaImg] = useState("/yogaImages/yoga-1.png");
+    let counter = 0;
     const [rh, setRh] = useState(0);
     const [lh, setLh] = useState(0);
     const [rl, setRl] = useState(0);
@@ -44,6 +59,7 @@ export default function Session() {
     const [rlw, setRlw] = useState(0);
     const [llw, setLlw] = useState(0);
     const [flag, setFlag] = useState(false);
+    let interval;
     time.setSeconds(time.getSeconds() + 600);
 
     let count = 0;
@@ -52,8 +68,35 @@ export default function Session() {
             inputResolution: { width: 640, height: 480 },
             scale: 0.8,
         });
-        setInterval(() => {
+        interval = setInterval(() => {
             detect(net);
+            counter = counter + 1;
+            if (counter == 15) {
+                counter = 0;
+                index = index + 1;
+                setYogaName(
+                    yogaLandmarks.angles[index].name
+                        .split(" ")
+                        .map(
+                            (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")
+                );
+                setYogaImg(`/yogaImages/yoga-${index + 1}.png`);
+                setNextYogaName(
+                    index == 19
+                        ? "-"
+                        : yogaLandmarks.angles[index + 1].name
+                              .split(" ")
+                              .map(
+                                  (word) =>
+                                      word.charAt(0).toUpperCase() +
+                                      word.slice(1)
+                              )
+                              .join(" ")
+                );
+            }
         }, 1000);
     };
 
@@ -83,9 +126,10 @@ export default function Session() {
         };
     });
 
-    useEffect(() => {
-        runPosenet();
-    }, []); // Run only once on component mount
+    // useEffect(() => {
+    //     if (!flag) return;
+    //     return () => runPosenet();
+    // }, []); // Run only once on component mount
 
     function find_angle(p0, p1, c) {
         // var p0c = Math.sqrt(Math.pow(c.x - p0.x, 2) + Math.pow(c.y - p0.y, 2)); // p0->c (b)
@@ -307,7 +351,10 @@ export default function Session() {
                     </ul>
                     <button
                         className="bg-green-600 mt-10 text-white py-2 px-7 rounded-md"
-                        onClick={() => setFlag(true)}
+                        onClick={() => {
+                            runPosenet();
+                            setFlag(true);
+                        }}
                     >
                         I Agree
                     </button>
@@ -332,12 +379,22 @@ export default function Session() {
                         />
 
                         <div className="w-[40%]">
-                            <VideoPlayer />
-                            <h1>Next: Asana</h1>
+                            {/* <VideoPlayer /> */}
+                            <img src={yogaImg} alt="" />
+                            <h1 className="font-bold text-xl my-2">
+                                Yoga Name : {yogaName}
+                            </h1>
+                            <h1 className="font-semibold text-sm my-2">
+                                Next Yoga Name : {nextYogaName}
+                            </h1>
                             <MyTimer expiryTimestamp={time} />
                             <button
                                 className="bg-red-600 mt-10 text-white py-2 px-7 rounded-md"
-                                onClick={() => navigate("/")}
+                                onClick={() => {
+                                    clearInterval(interval);
+                                    setFlag(false);
+                                    navigate("/");
+                                }}
                             >
                                 End Session
                             </button>
