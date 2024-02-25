@@ -48,7 +48,7 @@ export default function Home() {
             ) : (
                 <div>
                     {/* Hero Section Starts */}
-                    <div className="flex flex-col items-center bg-gradient-to-r from-[#d1601b4f] to-[#ad5c51d1] h-screen">
+                    <div className="flex flex-col items-center bg-gradient-to-r from-[#d1601b4f] to-[#ad5c51d1] min-h-screen pb-10">
                         <NavBar verified={verified} />
                         <img className="w-[60%] mt-12" src="./bg.png" alt="" />
                         <h1 className="text-gray-200 text-2xl mt-10 font-semibold">
