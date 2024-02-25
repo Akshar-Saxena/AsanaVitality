@@ -7,7 +7,7 @@ export default function Loader() {
         setIndex(Math.floor(Math.random() * 9));
     }, []);
     return (
-        <div className="flex justify-center items-center w-full h-screen">
+        <div className="flex absolute top-0 left-0 justify-center items-center w-full h-screen">
             <div className="flex flex-col items-center justify-center">
                 <h1 className="italic">Loading Asana Vitality</h1>
                 <img className="max-w-[200px]" src="./loader.gif" alt="" />
